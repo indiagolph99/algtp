@@ -1,0 +1,1 @@
+add_executable(main alg6.cpp)

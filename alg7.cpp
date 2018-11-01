@@ -6,13 +6,13 @@
 #include "assert.h"
 #include <algorithm>
 
-void partition(unsigned long long int *arr, int left, int right, int b) {
-     int i = left;
+void binary_sort(unsigned long long int *arr, size_t left, size_t right, size_t b) {
+     size_t i = left;
      if (right <= left || b < 0) {
 		return;
     }
 
-     for (int j = left; j <= right; j++)
+     for (size_t j = left; j <= right; j++)
      {
          if (!(arr[j] & ((unsigned long long int)1 << b)))
          {
@@ -20,19 +20,19 @@ void partition(unsigned long long int *arr, int left, int right, int b) {
              i++;
          }
      }
-     partition(arr, left, i - 1, b - 1);
-     partition(arr, i, right, b - 1);
+     binary_sort(arr, left, i - 1, b - 1);
+     binary_sort(arr, i, right, b - 1);
 }
 
 int main() {
-    int n = 0;
+    size_t n = 0;
     std::cin >> n;
     assert(n > 0);
     unsigned long long int arr[n];
     for (size_t i = 0; i < n; i++) {
         std::cin >> arr[i];
     }
-    partition(arr, 0, n - 1, 63);  // unsigned long long size = 64 bits
+    binary_sort(arr, 0, n - 1, 63);  // unsigned long long size = 64 bits
 
     for (size_t i = 0; i < n; i++) {
         std::cout << arr[i]  << " ";

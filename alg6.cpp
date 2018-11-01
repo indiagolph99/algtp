@@ -8,10 +8,10 @@
 
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include <algorithm> // for std::swap
 
-int med (int* arr, int left, int mid, int right)
+template <typename T> size_t med (T* arr, size_t left, size_t mid, size_t right)
 {
     if (arr[left] > arr[mid]) {
         if (arr[right] > arr[left])
@@ -24,11 +24,12 @@ int med (int* arr, int left, int mid, int right)
     return (arr[left] > arr[right]) ? left : right;
 }
 
-int partition(int *arr, int left, int right) {
-     int pivot = med(arr, left, (left + right) / 2, right);
+template <typename T> size_t partition(T *arr, size_t left, size_t right) {
+     size_t pivot = med(arr, left, (left + right) / 2, right);
      std::swap(arr[pivot], arr[right]);
-     int x = arr[right], i = left;
-     for (int j = left; j <= right - 1; j++)
+     T x = arr[right];
+     size_t i = left;
+     for (size_t j = left; j <= right - 1; j++)
      {
          if (arr[j] <= x)
          {
@@ -40,14 +41,14 @@ int partition(int *arr, int left, int right) {
      return i;
 }
 
-int k_statistic(int* arr, int k, int size) {
-    int left = 0, right = size;
+template <typename T> size_t k_statistic(T* arr, size_t k, size_t size) {
+    size_t left = 0, right = size;
     while (true) {
         if (left == right) {
             return arr[left];
         }
 
-        int mid = partition(arr, left, right);
+        size_t mid = partition(arr, left, right);
 
         if (mid == k) {
             return arr[mid];
@@ -63,8 +64,8 @@ int k_statistic(int* arr, int k, int size) {
 
 
 int main() {
-    int n = 0;
-    int k = 0;
+    size_t n = 0;
+    size_t k = 0;
 
     std::cin >> n;
     std::cin >> k;
