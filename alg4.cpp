@@ -5,8 +5,8 @@
 ести значение максимума в окне. Скорость работы O(n log n), память O(n).
 */
 #include <iostream>
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <string>
 #include <algorithm>
 
 template <class T>
@@ -15,7 +15,7 @@ class Heap {
     size_t curr_size;
     size_t heap_size;
 
-public:
+ public:
     Heap(): curr_size(0), heap_size(8) { buf = new T[8]; }
     explicit Heap(const T size) {
         curr_size = 0; heap_size = size; buf = new T[size];
@@ -28,7 +28,7 @@ public:
         size_t j = index;
         if (left < curr_size && array[buf[left]] > array[buf[index]]) {
             j = left;
-        }  //instead of values, indexes of max are stored
+        }  // instead of values, indexes of max are stored
         if (right < curr_size && array[buf[right]] > array[buf[j]]) {
             j = right;
         }
@@ -69,14 +69,13 @@ public:
     T top() {
         return buf[0];
     }
-
 };
 
 template<typename T> T* get_max(int input_size, int window_size, T* array) {
     Heap<T> H(input_size);
 
     for (size_t i = 0; i < window_size; i++) {
-        H.append(array, i);  //instead of values, indexes of are stored
+        H.append(array, i);  // instead of values, indexes of are stored
     }
 
     T * result = new T[input_size - window_size + 1];
@@ -85,7 +84,7 @@ template<typename T> T* get_max(int input_size, int window_size, T* array) {
 
     for (size_t i = 1; i <= input_size - window_size; i++) {
         H.append(array, i + window_size - 1);
-        while (H.top() < i) {       //remove all maxes outside the window
+        while (H.top() < i) {       // remove all maxes outside the window
             H.extract_max(array);
         }
         result[i] = array[H.top()];

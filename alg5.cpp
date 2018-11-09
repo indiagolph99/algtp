@@ -1,9 +1,11 @@
 // В супермаркете решили оптимизировать показ рекламы. Известно расписание
 // прихода и ухода покупателей (два целых числа). Каждому покупателю необходимо
-// показать минимум 2 рекламы. Рекламу можно транслировать только в целочисленные
-// моменты времени. Покупатель может видеть рекламу от момента прихода до момента
+// показать минимум 2 рекламы. Рекламу можно транслировать только в
+// целочисленные моменты времени. Покупатель может видеть рекламу от
+// момента прихода до момента
 // ухода из магазина. В каждый момент времени может показываться только одна
-// реклама. Считается, что реклама показывается мгновенно. Если реклама показывается
+// реклама. Считается, что реклама показывается мгновенно. Если
+// реклама показывается
 // в момент ухода или прихода, то считается, что посетитель успел её посмотреть.
 // Требуется определить минимальное число показов рекламы.
 
@@ -12,14 +14,15 @@
 // pair represents begin and end of visitor presence respectively
 template <class T>
 class pair {
-public:
+ public:
     T first;
     T second;
 };
 // arrange period by its beginning, if ends are equal
 template <typename T> void insert(pair<T> *arr, size_t index) {
     size_t t = index;
-    while (arr[t].second == arr[t - 1].second && arr[t - 1].first > arr[t].first) {
+    while (arr[t].second == arr[t - 1].second
+        && arr[t - 1].first > arr[t].first) {
         pair<T> temp = arr[t];
         arr[t] = arr[t - 1];
         arr[t - 1] = temp;
@@ -27,8 +30,9 @@ template <typename T> void insert(pair<T> *arr, size_t index) {
     }
 }
 
-//merge by the end of time period in ascending order
-template <typename T> void merge(size_t left, size_t right, size_t mid, pair<T>* arr) {
+// merge by the end of time period in ascending order
+template <typename T> void merge(size_t left, size_t right,
+     size_t mid, pair<T>* arr) {
     size_t it_left = mid - left + 1;
     size_t it_right = right - mid;
     size_t i, j, k;
@@ -68,7 +72,7 @@ template <typename T> void merge(size_t left, size_t right, size_t mid, pair<T>*
 
     while (j < it_right) {
         arr[k] = right_arr[j];
-        insert(arr,k);
+        insert(arr, k);
         j++;
         k++;
     }
@@ -90,7 +94,7 @@ template <typename T> size_t count_bans(pair<T>* arr, size_t n) {
     T ban_one = ban_two - 1;
     size_t count = 2;
     for (size_t i = 1; i < n; i++) {
-        // if one period ends before next begins - they have no intersection points
+// if one period ends before next begins - they have no intersection points
         if (ban_two < arr[i].first) {
             ban_two = arr[i].second;
             ban_one = ban_two - 1;

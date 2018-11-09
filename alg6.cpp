@@ -9,10 +9,10 @@
 
 #include <iostream>
 #include <cassert>
-#include <algorithm> // for std::swap
+#include <algorithm>  // for std::swap
 
-template <typename T> size_t med (T* arr, size_t left, size_t mid, size_t right)
-{
+template <typename T> size_t med(T* arr, size_t left,
+    size_t mid, size_t right) {
     if (arr[left] > arr[mid]) {
         if (arr[right] > arr[left])
         return left;
@@ -29,10 +29,8 @@ template <typename T> size_t partition(T *arr, size_t left, size_t right) {
      std::swap(arr[pivot], arr[right]);
      T x = arr[right];
      size_t i = left;
-     for (size_t j = left; j <= right - 1; j++)
-     {
-         if (arr[j] <= x)
-         {
+     for (size_t j = left; j <= right - 1; j++) {
+         if (arr[j] <= x) {
              std::swap(arr[i], arr[j]);
              i++;
          }
@@ -52,11 +50,9 @@ template <typename T> size_t k_statistic(T* arr, size_t k, size_t size) {
 
         if (mid == k) {
             return arr[mid];
-        }
-        else if (k < mid) {
+        } else if (k < mid) {
             right = mid - 1;
-        }
-        else {
+        } else {
             left = mid + 1;
         }
     }
@@ -70,11 +66,10 @@ int main() {
     std::cin >> n;
     std::cin >> k;
     assert(n > 0 && k >= 0 && k < n);
-    int arr[n];
+    auto *arr = new int[n];
     for (size_t i = 0; i < n; i++) {
         std::cin >> arr[i];
     }
-
+    delete[] arr;
     std::cout << k_statistic(arr, k, n - 1) << '\n';
-
 }

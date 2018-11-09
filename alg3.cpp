@@ -3,9 +3,9 @@
 Обрабатывать команды push back и pop front.
 */
 #include <iostream>
-#include <assert.h>
-#include <string.h>
-
+#include <cassert>
+#include <string>
+``
 template <class T>
 class Queue {
     T *buf;
@@ -15,8 +15,10 @@ class Queue {
     size_t head;
     size_t buf_cap;
     size_t curr_cap;
-public:
-    Queue(): buf_len(0), curr_len(0), tail(0), head(0), buf_cap(8), curr_cap(8) {buf = new T[8];}
+
+ public:
+    Queue(): buf_len(0), curr_len(0), tail(0), head(0),
+    buf_cap(8), curr_cap(8) {buf = new T[8];}
 
     ~Queue() { delete[] buf;}
 
@@ -28,7 +30,7 @@ public:
         buf_cap *= 2;
         delete[] buf;
         buf = new_buf;
-    };
+    }
     void push(const T& elem) {
         bool bufrealloc = false;
         bool ringrealloc = false;
@@ -45,7 +47,8 @@ public:
 
         if (bufrealloc) {
             tail = buf_cap;
-            extend_buf(); // double buffer capacity in that func and update len info
+            extend_buf();  // double buffer capacity in that func and update len
+             info
             if (ringrealloc) {
                 curr_cap = buf_cap;
             }
@@ -57,7 +60,7 @@ public:
             curr_len++;
         }
         tail = (tail + 1) % buf_cap;
-    };
+    }
 
     T pop() {
         if (buf_len == 0) {
@@ -75,7 +78,7 @@ public:
             head = (head + 1) % curr_cap;
         }
         return elem;
-    };
+    }
 };
 
 
