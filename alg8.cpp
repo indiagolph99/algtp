@@ -1,10 +1,9 @@
 //
-// Created by savva on 02.11.18.
-//
 
+#include <vector>
 #include <iostream>
 #include <string>
-#include <vector>
+#include <algorithm>
 
 int hash(const std::string &data, size_t tableSize) {
     int hash = 0;
@@ -13,79 +12,107 @@ int hash(const std::string &data, size_t tableSize) {
     return hash;
 }
 
-
 template<typename T>
 class HashTable {
  public:
-    HashTable() : keys_count(0), table(8) {}
+    HashTable() : keys_count(0), table(8) {
+        std::fill(table.begin(), table.end(), empty);
+    }
     HashTable(const HashTable &) = delete;
     HashTable &operator=(const HashTable &) = delete;
     bool Has(const T &value) const;
     bool Add(const T &value);
-    bool Remove(const T& value);
+    bool Remove(const T &value);
     void growTable();
+    size_t getSize() { return table.size(); }
  private:
-    size_t keys_count;
+    int keys_count;
+    const std::string del = "DELETED";
+    const std::string empty = "EMPTY";
     std::vector<T> table;
 };
 
 template<typename T>
-bool HashTable<T>::Add(const T &value) {
-    if (Has(value)) {
-        return false;
-    }
-
-    if (keys_count + 1 >= table.size() * 3 / 4)
-        growTable();
-
-    auto index = hash(value, table.size());
-    int h = 1;
-    while (!table[index].empty() && table[index] != "~") {
-        index = static_cast<int>((index + h * h) % table.size());
-        h++;
-    }
-    table[index] = value;
-    keys_count++;
-    return true;
-}
-
-template<typename T>
 bool HashTable<T>::Has(const T &value) const {
     int index = hash(value, table.size());
-    size_t h = 1;
-    while (table[index] != value &&
-    (!table[index].empty() || table[index] == "~")) {
-        index = static_cast<int>((index + h * h) % table.size());
-        h++;
+    int quadJump = 0;
+    while (!table[index].empty() && quadJump < table.size()) {
+        if (table[index] == value) {
+            return true;
+        }
+        index = static_cast<int>((index + quadJump + 1) % table.size());
+        quadJump++;
     }
-    return (table[index] == value);
+    return false;
 }
 
 template<typename T>
 bool HashTable<T>::Remove(const T &value) {
-    if (!Has(value)) {
-        return false;
+    size_t quadJump = 0;
+    auto index = static_cast<size_t>(hash(value, table.size()));
+    while (table[index] != value && quadJump < table.size()) {
+        if (!table[index].empty()) {
+            return false;
+        }
+        index = (index + quadJump + 1) % table.size();
+        quadJump++;
     }
-    int index = hash(value, table.size());
-    int h = 1;
-    while (table[index] != value && !table[index].empty()) {
-        index = static_cast<int>((index + h * h) % table.size());
-        h++;
+    if (table[index] == value) {
+        table[index] = del;
+        keys_count--;
+        return true;
     }
-    table[index] = "~";
-    return true;
+    return false;
 }
 
 template<typename T>
 void HashTable<T>::growTable() {
     std::vector<T> newTable(table.size() * 2);
-    for (const auto &i : table) {
-        if (!i.empty() && i != "~") {
-            int newHash = hash(i, newTable.size());
-            newTable[newHash] = i;
+    std::fill(newTable.begin(), newTable.end(), empty);
+    std::vector<T> oldTable(table);
+    table = newTable;
+    for (const auto &i : oldTable) {
+        if (!i.empty() && i != del) {
+            keys_count--;
+            Add(i);
         }
     }
-    table = newTable;
+}
+
+template<typename T>
+bool HashTable<T>::Add(const T &value) {
+    if (keys_count + 1 >= static_cast<int>(table.size()) * 3 / 4) {
+        growTable();
+    }
+
+    int quadJump = 0;
+    int index = hash(value, table.size());
+    int deletedIndex = 0;
+    bool deletedFound = false;
+    while (!table[index].empty() && quadJump < table.size()) {
+        if (table[index] == value) {
+            return false;
+        }
+
+        if (table[index] == del) {
+            deletedIndex = index;
+            deletedFound = true;
+        }
+        index = static_cast<int>((index + quadJump + 1) % table.size());
+        quadJump++;
+    }
+
+    if (!table[index].empty()) {
+        if (deletedFound) {
+            table[deletedIndex] = value;
+            keys_count++;
+            return true;
+        }
+        return false;
+    }
+    table[index] = value;
+    keys_count++;
+    return true;
 }
 
 int main() {
