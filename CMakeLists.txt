@@ -1,0 +1,1 @@
+add_executable(main alg8.cpp)

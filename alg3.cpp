@@ -5,7 +5,6 @@
 #include <iostream>
 #include <cassert>
 #include <string>
-``
 template <class T>
 class Queue {
     T *buf;

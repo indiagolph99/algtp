@@ -20,8 +20,8 @@ class SearchTree {
  public:
     SearchTree() : size(0), root(nullptr) {}
     void insert(const T& newValue);
-    void preOrdPrint();
-    bool empty() { return size == 0; }
+    void preOrdPrint() const ;
+    bool empty() const { return size == 0; }
     virtual ~SearchTree();
 
  private:

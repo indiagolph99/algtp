@@ -2,8 +2,7 @@
 
 #include <vector>
 #include <iostream>
-#include <string>
-#include <algorithm>
+
 
 int hash(const std::string &data, size_t tableSize) {
     int hash = 0;
@@ -14,10 +13,16 @@ int hash(const std::string &data, size_t tableSize) {
 
 template<typename T>
 class HashTable {
- public:
-    HashTable() : keys_count(0), table(8) {
-        std::fill(table.begin(), table.end(), empty);
-    }
+public:
+    class HashNode {
+    public:
+        HashNode() : deleted(false), empty(true) {}
+        T value;
+        bool deleted;
+        bool empty;
+    };
+
+    HashTable() : keys_count(0), table(16) {}
     HashTable(const HashTable &) = delete;
     HashTable &operator=(const HashTable &) = delete;
     bool Has(const T &value) const;
@@ -25,95 +30,88 @@ class HashTable {
     bool Remove(const T &value);
     void growTable();
     size_t getSize() { return table.size(); }
- private:
+private:
     int keys_count;
-    const std::string del = "DELETED";
-    const std::string empty = "EMPTY";
-    std::vector<T> table;
+    std::vector<HashNode> table;
 };
 
 template<typename T>
 bool HashTable<T>::Has(const T &value) const {
     int index = hash(value, table.size());
     int quadJump = 0;
-    while (!table[index].empty() && quadJump < table.size()) {
-        if (table[index] == value) {
-            return true;
+    while (quadJump < table.size()) {
+        if (!table[index].empty) {
+            if (table[index].value == value && !table[index].deleted) {
+                return true;
+            }
+        } else {
+            return false;
         }
         index = static_cast<int>((index + quadJump + 1) % table.size());
-        quadJump++;
+        ++quadJump;
     }
     return false;
 }
-
 template<typename T>
 bool HashTable<T>::Remove(const T &value) {
     size_t quadJump = 0;
     auto index = static_cast<size_t>(hash(value, table.size()));
-    while (table[index] != value && quadJump < table.size()) {
-        if (!table[index].empty()) {
+    while (quadJump < table.size()) {
+        if (!table[index].empty) {
+            if (table[index].value == value && !table[index].deleted) {
+                table[index].deleted = true;
+                keys_count--;
+                return true;
+            }
+        } else {
             return false;
         }
         index = (index + quadJump + 1) % table.size();
-        quadJump++;
-    }
-    if (table[index] == value) {
-        table[index] = del;
-        keys_count--;
-        return true;
+        ++quadJump;
     }
     return false;
 }
 
 template<typename T>
 void HashTable<T>::growTable() {
-    std::vector<T> newTable(table.size() * 2);
-    std::fill(newTable.begin(), newTable.end(), empty);
-    std::vector<T> oldTable(table);
-    table = newTable;
+    std::vector<HashNode> newTable(table.size() * 2);
+    std::vector<HashNode> oldTable(std::move(table));
+    table = std::move(newTable);
     for (const auto &i : oldTable) {
-        if (!i.empty() && i != del) {
+        if (!i.empty && !i.deleted) {
             keys_count--;
-            Add(i);
+            Add(i.value);
         }
     }
 }
 
 template<typename T>
 bool HashTable<T>::Add(const T &value) {
+
+    if(Has(value)) {
+        return false;
+    }
+
     if (keys_count + 1 >= static_cast<int>(table.size()) * 3 / 4) {
         growTable();
     }
 
-    int quadJump = 0;
-    int index = hash(value, table.size());
-    int deletedIndex = 0;
-    bool deletedFound = false;
-    while (!table[index].empty() && quadJump < table.size()) {
-        if (table[index] == value) {
-            return false;
-        }
-
-        if (table[index] == del) {
-            deletedIndex = index;
-            deletedFound = true;
-        }
-        index = static_cast<int>((index + quadJump + 1) % table.size());
-        quadJump++;
-    }
-
-    if (!table[index].empty()) {
-        if (deletedFound) {
-            table[deletedIndex] = value;
+    size_t quadJump = 0;
+    auto index = static_cast<size_t>(hash(value, table.size()));
+    while (quadJump < table.size()) {
+        if (table[index].empty || table[index].deleted) {
+            table[index].value = value;
+            table[index].empty = false;
+            table[index].deleted = false;
             keys_count++;
             return true;
         }
-        return false;
+        index = (index + quadJump + 1) % table.size();
+        ++quadJump;
     }
-    table[index] = value;
-    keys_count++;
-    return true;
+    return false;
 }
+
 
 int main() {
     HashTable<std::string> table;
