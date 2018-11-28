@@ -1,7 +1,7 @@
 //
 #include <iostream>
 #include <stack>
-
+#include <vector>
 template <class T>
 class Node {
  public:
@@ -20,9 +20,9 @@ class SearchTree {
  public:
     SearchTree() : size(0), root(nullptr) {}
     void insert(const T& newValue);
-    void preOrdPrint() const ;
+    std::vector<Node<T>*> getPreOrdList();
     bool empty() const { return size == 0; }
-    virtual ~SearchTree();
+     ~SearchTree();
 
  private:
     size_t size;
@@ -62,37 +62,31 @@ void SearchTree<T>::insert(const T &newValue) {
 }
 
 template<class T>
-void SearchTree<T>::preOrdPrint() {
+std::vector<Node<T>*> SearchTree<T>::getPreOrdList() {
+    std::vector<Node<T>*> result;
     std::stack<Node<T>*> stack;
     stack.push(root);
     size_t pseudoSize = size;
     while (pseudoSize != 0) {
         Node<T>* node = stack.top();
-        std::cout << node->value << " ";
+        result.push_back(node);
         stack.pop();
         pseudoSize--;
-        if (node->right != nullptr)
+        if (node->right != nullptr) {
             stack.push(node->right);
-        if (node->left != nullptr)
+        }
+        if (node->left != nullptr) {
             stack.push(node->left);
+        }
     }
-    std::cout << std::endl;
+    return result;
 }
 
 template<class T>
 SearchTree<T>::~SearchTree() {
-    std::stack<Node<T>*> stack;
-    stack.push(root);
-
-    while (!empty()) {
-        Node<T>* node = stack.top();
-        delete node;
-        stack.pop();
-        size--;
-        if (node->right != nullptr)
-            stack.push(node->right);
-        if (node->left != nullptr)
-            stack.push(node->left);
+    std::vector<Node<T>*> result = getPreOrdList();
+    for (auto& i : result) {
+        delete i;
     }
 }
 
@@ -106,7 +100,12 @@ int main() {
         std::cin >> value;
         tree.insert(value);
     }
-    tree.preOrdPrint();
+    auto print = tree.getPreOrdList();
+    for (auto& i : print) {
+        std::cout << i->value << ' ';
+    }
+    std::cout << std::endl;
+
     return 0;
 }
 
